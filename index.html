@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple IPTV Player</title>
+    <style>
+        :root {
+            --text: #000;
+            --bg: #f2f2f2;
+            --link: #ff5555;
+            --hover: #ffaaaa;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: #fff;
+                --bg: #222222;
+            }
+        }
+
+        a {
+            color: var(--link);
+            text-decoration: none;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            color: var(--hover);
+            text-shadow: 0 0 5px var(--link), 0 0 10px var(--link);
+        }
+
+        header {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        video {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: #000;
+        }
+
+        .input-container {
+            display: flex;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            outline: none;
+            border: none;
+            margin-right: 10px;
+            font-family: inherit;
+        }
+
+        button {
+            background-color: var(--link);
+            color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background-color: var(--hover);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="https://officialjh.github.io/" target="_blank">OfficialJH</a>
+    </header>
+
+    <h1>IPTV Player</h1>
+    <video id="videoPlayer" controls></video>
+    <div class="input-container">
+        <input type="text" id="m3u8Url" placeholder="Enter M3U8 URL" />
+        <button id="loadButton">Play</button>
+    </div>
+
+    <a href="https://iptv-org.github.io/" target="_blank">IPTV Video Links</a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.1.5/hls.min.js"></script>
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const loadButton = document.getElementById('loadButton');
+        const m3u8Url = document.getElementById('m3u8Url');
+
+        loadButton.addEventListener('click', () => {
+            const url = m3u8Url.value;
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(videoPlayer);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoPlayer.play();
+                });
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegURL')) {
+                videoPlayer.src = url;
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    videoPlayer.play();
+                });
+            } else {
+                alert('HLS not supported on your browser.');
+            }
+        });
+    </script>
+
+</body>
+</html>

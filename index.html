@@ -4,13 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple IPTV Player</title>
+    <title>IPTV Player</title>
     <style>
         :root {
             --text: #000;
             --bg: #f2f2f2;
+            --bg2: #f6f6f6;
             --link: #ff5555;
             --hover: #ffaaaa;
+            --button: #fff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: #fff;
+                --bg: #222;
+                --bg2: #333;
+                --button: #444;
+            }
         }
 
         body {
@@ -18,55 +29,46 @@
             color: var(--text);
             font-family: "Courier New", Courier, monospace;
             text-align: center;
-            padding: 0px 10px;
+            padding: 10px;
             margin: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --text: #fff;
-                --bg: #222222;
-            }
+            box-sizing: border-box;
         }
 
         a {
             color: var(--link);
             text-decoration: none;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
-            margin-top: 20px;
+            transition: color 0.3s ease;
         }
 
         a:hover {
             color: var(--hover);
-            text-shadow: 0 0 5px var(--link), 0 0 10px var(--link);
         }
 
-        header {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            font-weight: bold;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            width: 100%;
         }
 
         video {
             width: 100%;
-            max-width: 800px;
+            max-width: 950px;
             height: auto;
             border-radius: 10px;
-            margin-bottom: 10px;
             background-color: #000;
         }
 
         .input-container {
             display: flex;
             width: 100%;
-            max-width: 800px;
+            margin-top: 10px;
         }
 
         input {
@@ -74,14 +76,14 @@
             padding: 10px;
             border-radius: 5px;
             outline: none;
-            border: none;
-            margin-right: 10px;
+            border: 1px solid var(--text);
             font-family: inherit;
+            margin-right: 10px;
         }
 
         button {
-            background-color: var(--link);
-            color: #fff;
+            background-color: var(--button);
+            color: var(--text);
             cursor: pointer;
             padding: 10px;
             border-radius: 5px;
@@ -90,50 +92,253 @@
             font-family: inherit;
         }
 
-        button:hover {
-            background-color: var(--hover);
+        .channel-box {
+            display: grid;
+            width: 100%;
+            max-width: 700px;
+            padding: 10px;
+            background-color: var(--bg2);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .channel-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+        }
+
+        .channel-name {
+            flex: 1;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        .channel-buttons {
+            display: flex;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <a href="https://officialjh.github.io/" target="_blank">OfficialJH</a>
-    </header>
+    <div class="header">
+        <a href="https://officialjh.github.io/" target="_blank" style="font-size:20px;font-weight:bold">OfficialJH</a>
+        <a href="https://iptv-org.github.io/" target="_blank">IPTV Channel Links</a>
+    </div>
 
     <h1>IPTV Player</h1>
     <video id="videoPlayer" controls></video>
-    <div class="input-container">
-        <input type="text" id="m3u8Url" placeholder="Enter M3U8 URL" />
-        <button id="loadButton">Play</button>
+
+    <button onClick="toggleContent('channelBox')" style="background-color:var(--bg);padding:0;margin:10px;font-size:16px">Show/Hide Channels</button>
+
+    <div id="channelBox" class="channel-box" style="display:none">
+        <div style="display:flex;align-items:center">
+            <span style="flex:1;font-size:20px;font-weight:bold">Channels</span>
+            <button onClick="toggleContent('inputContainer')" title="Add channel">✚</button>
+        </div>
+
+        <div id="inputContainer" class="input-container" style="display:none">
+            <input id="channelURL" type="text" inputmode="url" placeholder="Enter M3U8 URL" />
+            <input id="channelName" type="text" maxlength="30" placeholder="Channel name (max 30 chars)" />
+            <button id="saveButton">Save</button>
+        </div>
+
+        <hr style="width:100%">
+
+        <div id="savedChannels">
+            <!-- Saved channels will be dynamically inserted here -->
+        </div>
     </div>
 
-    <a href="https://iptv-org.github.io/" target="_blank">IPTV Video Links</a>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.1.5/hls.min.js"></script>
+    <script src="hls.min.js"></script>
     <script>
         const videoPlayer = document.getElementById('videoPlayer');
-        const loadButton = document.getElementById('loadButton');
-        const m3u8Url = document.getElementById('m3u8Url');
+        const channelURL = document.getElementById('channelURL');
+        const channelName = document.getElementById('channelName');
+        let currentHls = null;
+        let renameTarget = null;
 
-        loadButton.addEventListener('click', () => {
-            const url = m3u8Url.value;
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(videoPlayer);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoPlayer.play();
-                });
-            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegURL')) {
-                videoPlayer.src = url;
-                videoPlayer.addEventListener('loadedmetadata', function() {
-                    videoPlayer.play();
-                });
-            } else {
-                alert('HLS not supported on your browser.');
+        function loadChannels() {
+            try {
+                const savedChannels = JSON.parse(localStorage.getItem('channels')) || {};
+                const channelList = document.getElementById('savedChannels');
+                channelList.innerHTML = ''; // Clear previous list
+
+                const entries = Object.entries(savedChannels);
+                if (entries.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.innerHTML = `
+                        <div class="channel-content">
+                            <span class="channel-name">No channels saved. Select the plus icon in the top-right to add a channel.</span>
+                        </div>
+                    `;
+                    channelList.appendChild(empty);
+                }
+
+                entries.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
+
+                for (const [name, url] of entries) {
+                    const channelItem = document.createElement('div');
+                    channelItem.className = 'channel';
+                    channelItem.innerHTML = `
+                        <div class="channel-content">
+                            <span class="channel-name" title="${url}">${name}</span>
+                            <div class="channel-buttons">
+                                <button class="playChannel" title="Play">▶</button>
+                                <button class="renameChannel" title="Edit" style="margin:0 5px">✎</button>
+                                <button class="deleteChannel" title="Delete" style="background-color:var(--link)">✖</button>
+                            </div>
+                        </div>
+                    `;
+
+                    channelItem.querySelector('.playChannel').addEventListener('click', () => playStream(url));
+                    channelItem.querySelector('.renameChannel').addEventListener('click', () => renameChannel(name));
+                    channelItem.querySelector('.deleteChannel').addEventListener('click', () => deleteChannel(name));
+
+                    channelList.appendChild(channelItem);
+                }
+            } catch (error) {
+                console.log('Error loading channels from localStorage:', error);
+                alert('Failed to load channels, please try again.');
+            }
+        }
+
+        function renameChannel(oldName) {
+            try {
+                const savedChannels = JSON.parse(localStorage.getItem('channels')) || {};
+                if (!savedChannels.hasOwnProperty(oldName)) return;
+
+                channelName.value = oldName;
+                channelURL.value = savedChannels[oldName];
+
+                const inputContainer = document.getElementById('inputContainer');
+                const isHidden = window.getComputedStyle(inputContainer).display === 'none';
+                if (isHidden) toggleContent('inputContainer');
+
+                renameTarget = oldName;
+            } catch (error) {
+                console.log('Error renaming channel:', error);
+                alert('Could not rename channel. Please try again.');
+            }
+        }
+
+        function deleteChannel(channelName) {
+            try {
+                const savedChannels = JSON.parse(localStorage.getItem('channels')) || {};
+                delete savedChannels[channelName];
+                localStorage.setItem('channels', JSON.stringify(savedChannels));
+                loadChannels(); // Reload the channels list
+            } catch (error) {
+                console.log('Error deleting channel:', error);
+                alert('Could not delete channel. Please try again.');
+            }
+        }
+
+        document.getElementById('saveButton').addEventListener('click', () => {
+            try {
+                const url = channelURL.value.trim();
+                const name = channelName.value.trim();
+
+                if (!url) {
+                    alert('Please enter a valid stream URL.');
+                    return;
+                }
+
+                if (!/^https?:\/\/\S+$/i.test(url)) {
+                    alert('Please enter a valid HTTP/HTTPS URL.');
+                    return;
+                }
+
+                if (!name) {
+                    alert('Please enter a channel name.');
+                    return;
+                }
+
+                if (name.length > 30) {
+                    alert('Channel name too long (max 30 chars).');
+                    return;
+                }
+
+                const savedChannels = JSON.parse(localStorage.getItem('channels')) || {};
+
+                if (renameTarget) {
+                    const oldName = renameTarget;
+                    if (!savedChannels.hasOwnProperty(oldName)) {
+                        alert('Original channel not found. It may have been removed.');
+                        renameTarget = null;
+                        loadChannels();
+                        return;
+                    }
+
+                    if (name !== oldName && savedChannels.hasOwnProperty(name)) {
+                        alert('A channel with that name already exists.');
+                        return;
+                    }
+
+                    delete savedChannels[oldName];
+                    savedChannels[name] = url;
+                    renameTarget = null;
+                } else {
+                    if (savedChannels.hasOwnProperty(name)) {
+                        if (!confirm('A channel with that name already exists. Overwrite?')) return;
+                    }
+                    savedChannels[name] = url;
+                }
+
+                localStorage.setItem('channels', JSON.stringify(savedChannels));
+                loadChannels();
+                channelURL.value = '';
+                channelName.value = '';
+                toggleContent('inputContainer');
+            } catch (error) {
+                console.log('Error saving channel:', error);
+                alert('Could not save channel. Please try again.');
             }
         });
+
+        function playStream(url) {
+            try {
+                if (currentHls) {
+                    try { currentHls.destroy(); } catch (e) {}
+                    currentHls = null;
+                }
+
+                if (Hls && Hls.isSupported && Hls.isSupported()) {
+                    currentHls = new Hls();
+                    currentHls.loadSource(url);
+                    currentHls.attachMedia(videoPlayer);
+                    currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        videoPlayer.play().catch(()=>{});
+                    });
+                    currentHls.on(Hls.Events.ERROR, function(event, data) {
+                      console.log('Hls error:', data);
+                      if (data && data.fatal) {
+                          alert('Playback error occurred. Try a different URL.');
+                      }
+                    });
+                } else if (videoPlayer.canPlayType && videoPlayer.canPlayType('application/vnd.apple.mpegURL')) {
+                    videoPlayer.src = url;
+                    videoPlayer.addEventListener('loadedmetadata', function handler() {
+                        videoPlayer.removeEventListener('loadedmetadata', handler);
+                        videoPlayer.play().catch(()=>{});
+                    });
+                } else {
+                    alert('HLS not supported on your browser.');
+                }
+            } catch (error) {
+                console.log('Error playing stream:', error);
+                alert('Could not play stream. Please check the URL and try again.');
+            }
+        }
+
+        function toggleContent(elementID) {
+            const element = document.getElementById(elementID);
+            const currentDisplay = window.getComputedStyle(element).display;
+            element.style.display = currentDisplay === "none" ? "" : "none";
+        }
+
+        document.addEventListener('DOMContentLoaded', loadChannels);
     </script>
 
 </body>

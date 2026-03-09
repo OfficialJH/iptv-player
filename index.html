@@ -11,33 +11,90 @@
 </head>
 
 <body>
-    <div class="header">
-        <a href="https://officialjh.github.io/" target="_blank" style="font-size:20px;font-weight:bold">OfficialJH</a>
-        <a href="https://iptv-org.github.io/" target="_blank">IPTV Channel Links</a>
-    </div>
+    <header>
+        <button onclick="aboutModal.showModal()">🛈 About</button>
+    </header>
 
     <h2 id="playerHeader" style="word-break:break-word">IPTV Player</h2>
     <video id="videoPlayer" controls></video>
 
-    <button onClick="toggleContent('channelBox')" style="background-color:var(--bg);padding:0;margin:10px;font-size:16px">Show/Hide Channels</button>
+    <!-- Channels Box -->
+    <details>
+        <summary>Show/Hide Channels</summary>
 
-    <div id="channelBox" class="channel-box" style="display:none">
-        <div style="display:flex;align-items:center">
-            <button id="importExportBtn" title="Import/Export">⇄</button>
-            <span style="flex:1;font-size:20px;font-weight:bold">Channels</span>
-            <button onClick="toggleContent('inputContainer')" title="Add channel">✚</button>
+        <div id="channelBox" class="channel-box" >
+            <div style="display:flex;align-items:center">
+                <button onclick="dataModal.showModal()">⇄</button>
+                <span style="flex:1;font-size:20px;font-weight:bold">Channels</span>
+                <button onclick="openModal('add')" title="Add channel">✚</button>
+            </div>
+
+            <hr style="width:100%">
+
+            <div id="savedChannels"></div>
         </div>
+    </details>
 
-        <div id="inputContainer" class="input-container" style="display:none">
-            <input id="channelURL" type="text" inputmode="url" placeholder="Enter M3U8 URL" />
-            <input id="channelName" type="text" maxlength="40" placeholder="Channel name (max 40 chars)" />
-            <button id="saveButton" style="flex:1 1 auto;width:auto">Save</button>
+    <!-- Add/Edit Channel Modal -->
+    <dialog id="channelModal" class="add-mode">
+        <div class="modal-content">
+            <h3>
+                <span class="add-title">Add Channel</span>
+                <span class="edit-title">Edit Channel</span>
+            </h3>
+
+            <form id="channelForm" class="input-container">
+                <input id="channelURL" type="url" required pattern="https?://.+" title="Must be a valid HTTP/HTTPS URL" placeholder="Enter M3U8 URL" />
+                <input id="channelName" type="text" maxlength="40" title="Max 40 characters" required placeholder="Channel name (max 40 chars)" />
+                <div style="display:flex; width:100%; gap:8px">
+                    <button type="submit" style="flex:1">Save</button>
+                    <button type="button" class="delete-btn" onclick="deleteCurrentChannel()" style="flex:1; background:var(--accent); color:white">Delete</button>
+                    <button type="button" onclick="channelModal.close()" style="flex:1">Close</button>
+                </div>
+            </form>
+
         </div>
+    </dialog>
 
-        <hr style="width:100%">
+    <!-- Import / Export Modal -->
+    <dialog id="dataModal">
+        <div class="modal-content">
+            <h3>Import / Export Channels</h3>
 
-        <div id="savedChannels"></div>
-    </div>
+            <div style="display:flex; width:100%; gap:8px">
+                <input id="importFile" type="file" accept="application/json" style="display:none" />
+                <button id="chooseImport" style="flex:1">Import JSON</button>
+                <button id="exportChannels" style="flex:1">Export JSON</button>
+            </div>
+            <span>
+                Import replaces current channels (you will be prompted to confirm). Export creates a JSON file of saved channels.
+            </span>
+            <button onclick="dataModal.close()">Close</button>
+        </div>
+    </dialog>
+
+    <!-- About Modal -->
+    <dialog id="aboutModal">
+        <div class="modal-content">
+            <h3>About</h3>
+
+            <span>
+                A lightweight, privacy-focused IPTV player for streaming your favorite M3U8 links.
+            </span>
+
+            <span>
+                Want to know where to get channel links? Find them <a href="https://iptv-org.github.io/" target="_blank">here</a>.
+            </span>
+
+            <span>
+                <a href="https://officialjh.github.io/" target="_blank">Main Website</a>
+                |
+                <a href="https://github.com/OfficialJH/iptv-player" target="_blank">Source Code</a>
+            </span>
+
+            <button onclick="aboutModal.close()">Close</button>
+        </div>
+    </dialog>
 
     <script src="hls.min.js"></script>
     <script src="script.js"></script>

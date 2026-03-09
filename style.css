@@ -1,10 +1,13 @@
+/* ===== ROOT & THEME ===== */
 :root {
     --text: #000;
-    --bg: #f2f2f2;
-    --bg2: #f6f6f6;
-    --link: #ff5555;
+    --bg: #eee;
+    --bg2: #f4f4f4;
+    --accent: #ff5555;
     --hover: #ffaaaa;
     --button: #fff;
+    --border: #ccc;
+    --shadow: 0 4px 12px rgba(0,0,0,0.2)
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,39 +16,89 @@
         --bg: #222;
         --bg2: #333;
         --button: #444;
+        --border: #555;
+        --shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
+* {
+    box-sizing: border-box;
     font-family: "Courier New", Courier, monospace;
+}
+
+
+/* ===== BASE ELEMENTS ===== */
+body {
+    background: var(--bg);
+    color: var(--text);
     text-align: center;
-    padding: 10px;
-    margin: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    box-sizing: border-box;
 }
 
 a {
-    color: var(--link);
+    color: var(--accent);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
-a:hover {
-    color: var(--hover);
+a:hover { color: var(--hover) }
+
+hr { color: var(--border) }
+
+button {
+    background: var(--button);
+    color: var(--text);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    min-width: 40px;
+    min-height: 40px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
+details {
+    width: 100%;
+    max-width: 600px;
     align-items: center;
-    padding: 0 10px;
+}
+
+details > summary {
+    margin: 10px;
+    cursor: pointer;
+}
+
+input {
+    background: var(--bg2);
+    color: var(--text);
+    min-width: 0;
+    min-height: 40px;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+header {
+    display: flex;
+    justify-content: right;
     width: 100%;
 }
 
@@ -53,55 +106,24 @@ video {
     width: 100%;
     max-width: 900px;
     height: auto;
-    border-radius: 10px;
-    background-color: #000;
-}
-
-.input-container {
-    display: flex;
-    width: 100%;
-    margin-top: 10px;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-input {
-    flex: 1 1 140px;
-    min-width: 0;
-    padding: 10px;
-    border-radius: 5px;
-    outline: none;
-    border: 1px solid var(--text);
-    font-family: inherit;
-}
-
-button {
-    background-color: var(--button);
-    color: var(--text);
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-    font-family: inherit;
+    border-radius: 8px;
+    background: #000;
 }
 
 .channel-box {
     display: grid;
     width: 100%;
-    max-width: 600px;
-    padding: 10px;
-    background-color: var(--bg2);
-    border-radius: 5px;
+    padding: 12px;
+    background: var(--bg2);
+    border-radius: 8px;
     box-sizing: border-box;
+    box-shadow: var(--shadow);
 }
 
 .channel-content {
     display: flex;
-    justify-content: space-between;
+    gap: 8px;
     align-items: center;
-    padding-top: 10px;
 }
 
 .channel-name {
@@ -111,6 +133,47 @@ button {
     word-break: break-word;
 }
 
-.channel-buttons {
-    display: flex;
+.channel + .channel {
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    padding-top: 4px;
 }
+
+
+/* ===== DIALOG/MODAL =====*/
+dialog {
+    width: min(80vw, 320px);
+    max-height: 90vh;
+    background: var(--bg);
+    color: inherit;
+    border: none;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+}
+
+dialog::backdrop {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    word-break: break-word;
+    text-align: left;
+}
+
+dialog h3 {
+    margin: 0;
+    padding-bottom: 4px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+#channelModal.add-mode .edit-title,
+#channelModal.add-mode .delete-btn { display: none }
+
+#channelModal.edit-mode .add-title { display: none }
+#channelModal.edit-mode .delete-btn { display: block }

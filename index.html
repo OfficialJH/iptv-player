@@ -12,7 +12,7 @@
 
 <body>
     <header>
-        <button onclick="aboutModal.showModal()">🛈 About</button>
+        <button onclick="aboutModal.showModal()">ⓘ About</button>
     </header>
 
     <h2 id="playerHeader" style="word-break:break-word">IPTV Player</h2>
@@ -49,10 +49,9 @@
                 <div style="display:flex; width:100%; gap:8px">
                     <button type="submit" style="flex:1">Save</button>
                     <button type="button" class="delete-btn" onclick="deleteCurrentChannel()" style="flex:1; background:var(--accent); color:white">Delete</button>
-                    <button type="button" onclick="channelModal.close()" style="flex:1">Close</button>
+                    <button type="button" onclick="channelModal.close()" style="flex:1" autofocus>Close</button>
                 </div>
             </form>
-
         </div>
     </dialog>
 
@@ -61,15 +60,17 @@
         <div class="modal-content">
             <h3>Import / Export Channels</h3>
 
+            <span>
+                Import replaces current channels (you will be prompted to confirm). Export creates a JSON file of saved channels.
+            </span>
+
             <div style="display:flex; width:100%; gap:8px">
                 <input id="importFile" type="file" accept="application/json" style="display:none" />
                 <button id="chooseImport" style="flex:1">Import JSON</button>
                 <button id="exportChannels" style="flex:1">Export JSON</button>
             </div>
-            <span>
-                Import replaces current channels (you will be prompted to confirm). Export creates a JSON file of saved channels.
-            </span>
-            <button onclick="dataModal.close()">Close</button>
+
+            <button onclick="dataModal.close()" autofocus>Close</button>
         </div>
     </dialog>
 
@@ -92,7 +93,7 @@
                 <a href="https://github.com/OfficialJH/iptv-player" target="_blank">Source Code</a>
             </span>
 
-            <button onclick="aboutModal.close()">Close</button>
+            <button onclick="aboutModal.close()" autofocus>Close</button>
         </div>
     </dialog>
 

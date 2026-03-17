@@ -29,14 +29,16 @@
 
 /* ===== BASE ELEMENTS ===== */
 body {
-    background: var(--bg);
-    color: var(--text);
-    text-align: center;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    height: 100vh;
+
+    background: var(--bg);
+    color: var(--text);
+
+    text-align: center;
 }
 
 a {
@@ -50,17 +52,21 @@ a:hover { color: var(--hover) }
 hr { color: var(--border) }
 
 button {
-    background: var(--button);
-    color: var(--text);
-    cursor: pointer;
+    min-width: 36px;
+    min-height: 36px;
     padding: 8px;
     border-radius: 6px;
     border: none;
-    min-width: 40px;
-    min-height: 40px;
+
+    background: var(--button);
+    color: var(--text);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+
+
     font-family: inherit;
     font-size: 1rem;
-    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+
+    cursor: pointer;
 }
 
 details {
@@ -70,7 +76,7 @@ details {
 }
 
 details > summary {
-    margin: 10px;
+    margin: 8px;
     cursor: pointer;
 }
 
@@ -78,7 +84,7 @@ input {
     background: var(--bg2);
     color: var(--text);
     min-width: 0;
-    min-height: 40px;
+    min-height: 36px;
     padding: 0 8px;
     border-radius: 6px;
     border: none;
@@ -105,7 +111,7 @@ header {
 
 video {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     height: auto;
     border-radius: 8px;
     background: #000;
@@ -136,8 +142,8 @@ video {
 
 .channel + .channel {
     border-top: 1px solid var(--border);
-    margin-top: 4px;
-    padding-top: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
 }
 
 
@@ -161,7 +167,7 @@ dialog::backdrop {
 .modal-content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     word-break: break-word;
     text-align: left;
 }

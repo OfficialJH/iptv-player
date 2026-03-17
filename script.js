@@ -123,6 +123,20 @@ function playStream(url, name) {
     }
 }
 
+function stopStream() {
+    if (videoPlayer) {
+        videoPlayer.pause();
+        videoPlayer.load();
+    }
+    
+    if (currentHls) {
+        currentHls.destroy();
+        currentHls = null;
+    }
+    
+    playerHeader.textContent = "IPTV Player";
+}
+
 // Helper to download text as file
 function downloadFile(filename, content) {
     const blob = new Blob([content], {

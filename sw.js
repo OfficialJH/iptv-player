@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iptv-2026-03-17';
+const CACHE_NAME = 'iptv-2026-03-21';
 const ASSETS = [
   './',
   './index.html',
